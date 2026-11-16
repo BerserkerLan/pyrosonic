@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Pyrosonic — turn any song into a fireworks show</title>
+    <meta name="description" content="Drop in a song and watch a fireworks display choreographed to its beat, bass, harmony and lyrics — generated live in your browser." />
+    <meta name="theme-color" content="#03040a" />
+    <meta property="og:title" content="Pyrosonic" />
+    <meta property="og:description" content="Turn any song into a beat-perfect fireworks show." />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body>
+    <canvas id="stage" aria-hidden="true"></canvas>
+    <div class="scrim" id="scrim"></div>
+
+    <header class="topbar" id="topbar">
+      <button class="brand" id="brand" aria-label="Pyrosonic home">
+        <svg viewBox="0 0 32 32" aria-hidden="true">
+          <defs>
+            <linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#ffd27a" />
+              <stop offset=".45" stop-color="#ff7a59" />
+              <stop offset=".75" stop-color="#ff4f9a" />
+              <stop offset="1" stop-color="#8b5cff" />
+            </linearGradient>
+          </defs>
+          <g stroke="url(#lg)" stroke-width="2.2" stroke-linecap="round" fill="none">
+            <path d="M16 3v6M16 23v6M3 16h6M23 16h6M6.8 6.8l4.2 4.2M21 21l4.2 4.2M6.8 25.2 11 21M21 11l4.2-4.2" />
+          </g>
+          <circle cx="16" cy="16" r="3.2" fill="url(#lg)" />
+        </svg>
+        <span>Pyrosonic</span>
+      </button>
+      <div class="topbar-actions">
+        <button class="btn small" id="btn-how">How it works</button>
+      </div>
+    </header>
+
+    <!-- Home -->
+    <main class="view" id="view-home">
+      <section class="hero">
+        <p class="eyebrow"><span class="spark"></span>Music-choreographed fireworks</p>
+        <h1>Turn any song into a <em>fireworks&nbsp;show.</em></h1>
+        <p class="lede">
+          Drop in a track. Pyrosonic listens to every beat, bassline, chord and lyric — then fires each shell early so it
+          bursts exactly on cue.
+        </p>
+
+        <div class="dropzone" id="dropzone" role="button" tabindex="0" aria-describedby="dz-hint" aria-label="Choose a song to turn into a fireworks show">
+          <div class="dz-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 18V5l12-2v13" /><circle cx="6" cy="18" r="3" /><circle cx="18" cy="16" r="3" />
+            </svg>
+          </div>
+          <div class="dz-title">Drop a song here or <span class="link">browse files</span></div>
+          <div class="dz-hint" id="dz-hint">MP3, WAV, FLAC, OGG or M4A · analysed privately on your device</div>
+        </div>
+
+        <div class="hero-actions">
+          <button class="btn" id="btn-demo">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.14v13.72a1 1 0 0 0 1.52.85l11.02-6.86a1 1 0 0 0 0-1.7L9.52 4.29A1 1 0 0 0 8 5.14z" /></svg>
+            Play the demo show
+          </button>
+        </div>
+
+        <ul class="pillars">
+          <li>
+            <span class="pi" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h3l3-8 4 16 3-8h5" /></svg></span>
+            <strong>Beat-locked timing</strong>
+            <span>Every shell launches early so it bursts on the beat.</span>
+          </li>
+          <li>
+            <span class="pi" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r="2.5" /><circle cx="17.5" cy="13.5" r="2.5" /><circle cx="6.5" cy="12.5" r="2.5" /><path d="M12 22a10 10 0 1 1 10-10c0 2.2-1.8 3-4 3h-2a2 2 0 0 0-1.5 3.3A2 2 0 0 1 12 22z" /></svg></span>
+            <strong>Coloured by harmony</strong>
+            <span>Key, chords and timbre choose the palette.</span>
+          </li>
+          <li>
+            <span class="pi" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h10M4 17h7" /><path d="m17 14 1.2 2.6L21 17l-2.1 1.9.6 2.8-2.5-1.4-2.5 1.4.6-2.8L13 17l2.8-.4z" /></svg></span>
+            <strong>Lyric-aware</strong>
+            <span>Synced lyrics trigger hearts, stars and colour words.</span>
+          </li>
+        </ul>
+        <p class="privacy">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></svg>
+          Your audio never leaves your browser.
+        </p>
+      </section>
+    </main>
+
+    <!-- Analysis -->
+    <section class="view hidden" id="view-analysis" aria-live="polite">
+      <div class="card">
+        <div class="track">
+          <div class="cover generated" id="an-cover" aria-hidden="true"></div>
+          <div class="meta">
+            <div class="title" id="an-title">—</div>
+            <div class="artist" id="an-artist"></div>
+          </div>
+          <div class="dur" id="an-duration"></div>
+        </div>
+        <canvas class="wave" id="an-wave" aria-hidden="true"></canvas>
+        <ol class="steps" id="an-steps">
+          <li data-step="decode"><span class="st"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg></span>Decoding audio<span class="note"></span></li>
+          <li data-step="rhythm"><span class="st"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg></span>Finding the beat, bass &amp; treble<span class="note"></span></li>
+          <li data-step="harmony"><span class="st"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg></span>Reading key, chords &amp; melody<span class="note"></span></li>
+          <li data-step="structure"><span class="st"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg></span>Mapping verses, builds &amp; drops<span class="note"></span></li>
+          <li data-step="lyrics"><span class="st"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg></span>Finding synced lyrics<span class="note"></span></li>
+          <li data-step="design"><span class="st"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg></span>Choreographing the show<span class="note"></span></li>
+        </ol>
+        <div class="facts" id="an-facts"></div>
+        <div class="lyrics-tools" id="an-lyrics-tools">
+          <button class="text-btn" id="an-load-lrc">Add lyrics (.lrc)…</button>
+        </div>
+        <div class="progress" role="progressbar" aria-label="Analysis progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="an-progress"><div class="bar" id="an-bar"></div></div>
+        <div class="actions">
+          <button class="btn" id="an-cancel">Choose another song</button>
+          <button class="btn primary" id="an-start" disabled>
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.14v13.72a1 1 0 0 0 1.52.85l11.02-6.86a1 1 0 0 0 0-1.7L9.52 4.29A1 1 0 0 0 8 5.14z" /></svg>
+            Start the show
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Show -->
+    <section class="view hidden" id="view-show">
+      <div class="show-meta" id="show-meta">
+        <div class="cover generated" id="sm-cover" aria-hidden="true"></div>
+        <div>
+          <div class="t" id="sm-title"></div>
+          <div class="a" id="sm-artist"></div>
+        </div>
+      </div>
+      <div class="hud" id="hud">
+        <span class="chip" id="hud-tempo"><span class="beat-dot" id="beat-dot"></span><b id="hud-bpm">—</b> BPM</span>
+        <span class="chip ctl-hide-sm" id="hud-key"></span>
+      </div>
+      <div class="titlecard gone" id="titlecard" aria-hidden="true">
+        <div class="tc-kicker">Now presenting</div>
+        <div class="tc-title" id="tc-title"></div>
+        <div class="tc-artist" id="tc-artist"></div>
+      </div>
+      <div class="lyrics" id="lyrics" aria-live="off"></div>
+
+      <div class="settings closed" id="settings" role="dialog" aria-label="Show settings">
+        <h3>Show settings</h3>
+        <div class="set-group">
+          <div class="set-label">Intensity</div>
+          <div class="segmented" role="radiogroup" aria-label="Show intensity" id="set-intensity">
+            <button role="radio" data-value="0.7">Calm</button>
+            <button role="radio" data-value="1">Balanced</button>
+            <button role="radio" data-value="1.4">Spectacular</button>
+          </div>
+        </div>
+        <div class="set-group">
+          <div class="set-label">Scene</div>
+          <div class="toggle-row"><span>Crowd silhouettes</span><button class="switch" role="switch" id="set-crowd" aria-label="Crowd silhouettes"></button></div>
+          <div class="toggle-row"><span>Cinematic camera drift</span><button class="switch" role="switch" id="set-motion" aria-label="Camera drift"></button></div>
+          <div class="toggle-row"><span>Reduce flashing<small>Softer bursts, no strobes</small></span><button class="switch" role="switch" id="set-calm" aria-label="Reduce flashing"></button></div>
+        </div>
+        <div class="set-group">
+          <div class="set-label">Sound &amp; lyrics</div>
+          <div class="toggle-row"><span>Pyrotechnic sound effects<small>Booms &amp; crackles on the beat</small></span><button class="switch" role="switch" id="set-sfx" aria-label="Pyrotechnic sound effects"></button></div>
+          <div class="toggle-row"><span>Lyric captions</span><button class="switch" role="switch" id="set-captions" aria-label="Lyric captions"></button></div>
+          <div class="toggle-row"><span>Find lyrics online<small>Sends only title &amp; artist to lrclib.net · next song</small></span><button class="switch" role="switch" id="set-online" aria-label="Find lyrics online"></button></div>
+          <div class="set-note" id="set-lyrics-note">No synced lyrics loaded.</div>
+          <div class="lyrics-tools"><button class="text-btn" id="set-load-lrc">Load an .lrc file…</button></div>
+        </div>
+        <div class="set-group">
+          <div class="set-label">Display &amp; sync</div>
+          <div class="segmented" role="radiogroup" aria-label="Render quality" id="set-quality">
+            <button role="radio" data-value="auto">Auto</button>
+            <button role="radio" data-value="high">High</button>
+            <button role="radio" data-value="medium">Medium</button>
+            <button role="radio" data-value="low">Low</button>
+          </div>
+          <div class="range-row" style="margin-top: 14px">
+            <span>A/V offset</span>
+            <input type="range" id="set-offset" min="-300" max="300" step="5" aria-label="Audio-visual offset in milliseconds" />
+            <output id="set-offset-out">0 ms</output>
+          </div>
+          <div class="set-note">If bursts feel late (e.g. Bluetooth headphones), drag left.</div>
+        </div>
+      </div>
+
+      <div class="controls" id="controls">
+        <div class="timeline" id="timeline" role="slider" tabindex="0" aria-label="Seek" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <canvas id="tl-canvas"></canvas>
+          <div class="playhead" id="tl-playhead"></div>
+          <div class="tl-tip" id="tl-tip"></div>
+        </div>
+        <div class="ctl-row">
+          <button class="icon-btn play" id="btn-play" aria-label="Play" data-tip="Play (Space)"></button>
+          <span class="time" id="time"><b>0:00</b> / 0:00</span>
+          <div class="volume">
+            <button class="icon-btn" id="btn-mute" aria-label="Mute" data-tip="Mute (M)"></button>
+            <input type="range" id="volume" min="0" max="1" step="0.01" aria-label="Volume" />
+          </div>
+          <div class="spacer"></div>
+          <span class="section-chip" id="section-chip"><span class="sw" id="section-sw"></span><span id="section-name">—</span></span>
+          <div class="spacer"></div>
+          <button class="icon-btn" id="btn-captions" aria-label="Lyric captions" aria-pressed="true" data-tip="Captions (C)"></button>
+          <button class="icon-btn" id="btn-settings" aria-label="Settings" aria-expanded="false" data-tip="Settings"></button>
+          <button class="icon-btn" id="btn-fullscreen" aria-label="Fullscreen" data-tip="Fullscreen (F)"></button>
+          <button class="icon-btn" id="btn-exit" aria-label="Choose another song" data-tip="New song"></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- End -->
+    <section class="view hidden" id="view-end">
+      <div class="card end-card">
+        <div class="tc-kicker" style="color: var(--ink-3); font-size: 12px; letter-spacing: 0.3em; text-transform: uppercase">Finale</div>
+        <h2>That's the show.</h2>
+        <p id="end-sub"></p>
+        <div class="stats" id="end-stats"></div>
+        <div class="actions">
+          <button class="btn" id="end-new">New song</button>
+          <button class="btn primary" id="end-replay">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8" /><path d="M3 3v5h5" /></svg>
+            Watch again
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <dialog id="dlg-how" aria-labelledby="how-title">
+      <div class="dlg-body">
+        <button class="icon-btn dlg-close" id="dlg-close" aria-label="Close"></button>
+        <h2 id="how-title">How it works</h2>
+        <p>Everything below happens on your device in a few seconds.</p>
+        <ol class="how">
+          <li><span class="n">1</span><div><strong>Listen</strong><span>Thousands of short spectra measure bass, mids, treble, brightness and onsets; a dynamic-programming beat tracker locks onto the tempo and bar lines.</span></div></li>
+          <li><span class="n">2</span><div><strong>Understand</strong><span>Chroma features find the key and chords; a self-similarity novelty curve splits the song into intro, verses, builds, drops and finale.</span></div></li>
+          <li><span class="n">3</span><div><strong>Read the words</strong><span>Synced lyrics (embedded, an .lrc file, or the open LRCLIB database) turn words like “love”, “fire” or “gold” into matching shells.</span></div></li>
+          <li><span class="n">4</span><div><strong>Choreograph</strong><span>Each musical moment gets the right effect — peonies on downbeats, crossettes on snares, glitter on hi-hats, willows for long notes, salutes on drops — timed so it bursts on the beat.</span></div></li>
+          <li><span class="n">5</span><div><strong>Fire</strong><span>A GPU particle engine renders every star’s physics live, synced to the audio clock with latency compensation.</span></div></li>
+        </ol>
+        <p class="set-note" style="margin: 16px 0 0">Sensitive to flashing light? Turn on <strong>Reduce flashing</strong> in the show settings for softer bursts and no strobes.</p>
+        <div class="kbd-grid">
+          <kbd>Space</kbd><span>Play / pause</span><kbd>← →</kbd><span>Seek 5 s</span>
+          <kbd>F</kbd><span>Fullscreen</span><kbd>M</kbd><span>Mute</span>
+          <kbd>C</kbd><span>Captions</span><kbd>H</kbd><span>Hide interface</span>
+        </div>
+      </div>
+    </dialog>
+
+    <div class="drop-overlay" id="drop-overlay" aria-hidden="true">Release to light up the sky</div>
+    <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+    <input type="file" id="file-input" accept="audio/*,.mp3,.wav,.flac,.ogg,.oga,.opus,.m4a,.aac,.webm,.mp4,.m4b" hidden />
+    <input type="file" id="lrc-input" accept=".lrc,.txt,text/plain" hidden />
+    <noscript><div class="fatal"><div><h2>JavaScript required</h2><p>Pyrosonic generates the show in your browser, so it needs JavaScript enabled.</p></div></div></noscript>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
